@@ -2,6 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { sequelize } = require("./models");
+const indexRouter = require("./routes/index.routes");
 
 class Server {
   expressconnect = async () => {
@@ -13,24 +14,26 @@ class Server {
     this.app.use(express.json());
     this.app.use(cookieParser());
     this.app.use(cors());
+    this.app.use("/api", indexRouter);
+
     this.app.use(express.static("public"));
   };
 
-  //   connectDatabase = async () => {
-  //     sequelize
-  //       .sync()
-  //       .then(() => {
-  //         console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다`);
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //       });
-  //   };
+  connectDatabase = async () => {
+    sequelize
+      .sync({ force: true })
+      .then(() => {
+        console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다1`);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   start = async () => {
     this.expressconnect();
     this.connectMiddleware();
-    // this.connectDatabase();
+    this.connectDatabase();
     this.app.listen(3000, () => {
       console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다`);
     });

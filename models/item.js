@@ -7,18 +7,22 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
-    }
+    static associate(models) {}
   }
   item.init(
     {
-      id: { type: DataTypes.BIGINT, primaryKey: true },
+      id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
       name: DataTypes.STRING,
-      option_id: DataTypes.BIGINT,
+      option_id: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0,
+      },
       price: DataTypes.BIGINT,
-      type: { type: DataTypes.ENUM, values: ["a", "b", "c"] },
-      amout: DataTypes.BIGINT,
+      type: { type: DataTypes.ENUM, values: ["COFFEE", "JUICE", "FOOD"] },
+      amout: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0,
+      },
     },
     {
       sequelize,
