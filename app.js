@@ -21,7 +21,7 @@ class Server {
 
   connectDatabase = async () => {
     sequelize
-      .sync({ force: true })
+      .sync()
       .then(() => {
         console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다1`);
       })

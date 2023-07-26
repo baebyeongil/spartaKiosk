@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       price: DataTypes.BIGINT,
       type: { type: DataTypes.ENUM, values: ["COFFEE", "JUICE", "FOOD"] },
-      amout: {
+      amount: {
         type: DataTypes.BIGINT,
         defaultValue: 0,
       },
