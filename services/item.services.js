@@ -1,4 +1,6 @@
 const ItemRepository = require("../repositories/item.repositories");
+const ItemType = require("../enum");
+const itemType = new ItemType();
 
 class ItemService {
   itemRepository = new ItemRepository();
@@ -10,18 +12,20 @@ class ItemService {
           status: 400,
           message: "{name}을 입력해주세요",
         };
-      } else if (!["COFFEE", "JUICE", "FOOD"].includes(type)) {
+      } else if (!itemType.itemTypes[type]) {
         return {
           status: 400,
           message: "알맞은 타입을 지정해주세요",
         };
       }
-      const Item = await this.itemRepository.createItem(name, price, type);
+      const iType = itemType.itemTypes[type];
+      const Item = await this.itemRepository.createItem(name, price, iType);
       return {
         status: 200,
         message: Item,
       };
     } catch (err) {
+      console.log(err);
       return { status: 500, message: "Server Error" };
     }
   };

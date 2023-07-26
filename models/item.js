@@ -1,5 +1,9 @@
 "use strict";
 const { Model } = require("sequelize");
+const ItemEnum = require("../enum");
+
+const itemEnum = new ItemEnum();
+
 module.exports = (sequelize, DataTypes) => {
   class item extends Model {
     /**
@@ -9,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {}
   }
+
   item.init(
     {
       id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
@@ -18,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       price: DataTypes.BIGINT,
-      type: { type: DataTypes.ENUM, values: ["COFFEE", "JUICE", "FOOD"] },
+      type: { type: DataTypes.ENUM, values: [Object.values(itemEnum.itemTypes)] },
       amount: {
         type: DataTypes.BIGINT,
         defaultValue: 0,
