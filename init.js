@@ -1,9 +1,10 @@
-class Enum {
+class Init {
   itemTypes = {
     COFFEE: "coffee",
     JUICE: "juice",
     FOOD: "food",
   };
+
   orderItemState = {
     ORDERED: 0,
     PENDING: 1,
@@ -11,5 +12,4 @@ class Enum {
     CANCELED: 3,
   };
 }
-
-module.exports = Enum;
+module.exports = Init;

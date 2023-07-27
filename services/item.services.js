@@ -1,5 +1,5 @@
 const ItemRepository = require("../repositories/item.repositories");
-const ItemType = require("../enum");
+const ItemType = require("../init");
 const itemType = new ItemType();
 
 class ItemService {
@@ -11,6 +11,11 @@ class ItemService {
         return {
           status: 400,
           message: "{name}을 입력해주세요",
+        };
+      } else if (!type) {
+        return {
+          status: 400,
+          message: "알맞은 타입을 지정해주세요",
         };
       } else if (!itemType.itemTypes[type]) {
         return {

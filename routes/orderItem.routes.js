@@ -5,5 +5,6 @@ const OrderItemController = require("../controllers/orderItem.controllers");
 const orderItemController = new OrderItemController();
 
 router.post("/orderItem", orderItemController.orderItem);
+router.put("/orderItem/:id", orderItemController.updateOrderItem);
 
 module.exports = router;

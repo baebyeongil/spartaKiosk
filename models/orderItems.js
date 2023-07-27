@@ -1,38 +1,39 @@
 "use strict";
 const { Model } = require("sequelize");
-const ItemEnum = require("../enum");
-
-const itemEnum = new ItemEnum();
 
 module.exports = (sequelize, DataTypes) => {
-  class item extends Model {
+  class orderItems extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {}
+    static associate(models) {
+      this.belongsTo(models.items, {
+        targetKey: "id",
+        foreignKey: "itemId",
+      });
+    }
   }
-
-  item.init(
+  orderItems.init(
     {
       id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
-      name: DataTypes.STRING,
-      option_id: {
+      itemId: {
+        type: DataTypes.BIGINT,
+      },
+      amount: {
         type: DataTypes.BIGINT,
         defaultValue: 0,
       },
-      price: DataTypes.BIGINT,
-      type: { type: DataTypes.ENUM, values: [Object.values(itemEnum.itemTypes)] },
-      amount: {
+      state: {
         type: DataTypes.BIGINT,
         defaultValue: 0,
       },
     },
     {
       sequelize,
-      modelName: "item",
+      modelName: "orderItems",
     }
   );
-  return item;
+  return orderItems;
 };

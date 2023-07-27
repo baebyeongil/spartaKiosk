@@ -19,16 +19,16 @@ class Server {
     this.app.use(express.static("public"));
   };
 
-  // connectDatabase = async () => {
-  //   sequelize
-  //     .sync({ force: true })
-  //     .then(() => {
-  //       console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다1`);
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // };
+  connectDatabase = async () => {
+    sequelize
+      .sync({ force: true })
+      .then(() => {
+        console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다1`);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   start = async () => {
     this.expressconnect();
