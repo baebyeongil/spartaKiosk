@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "id",
         foreignKey: "itemId",
       });
+
+      this.belongsTo(models.itemOrderCustomers, {
+        sourceKey: "id",
+        foreignKey: "itemId",
+      });
     }
   }
 

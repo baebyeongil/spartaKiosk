@@ -2,10 +2,11 @@ const { orderItems, items } = require("../models");
 const sequelize = require("../models/index").sequelize;
 
 class OrderItemItemRepository {
-  orderItem = async (itemId, ordered) => {
+  orderItem = async (itemId, ordered, amount) => {
     const OrderItem = await orderItems.create({
       itemId,
       state: ordered,
+      amount,
     });
     return OrderItem;
   };
@@ -21,6 +22,7 @@ class OrderItemItemRepository {
     const updateorderItem = await orderItems.update(
       {
         state: ordered,
+        amount,
       },
       {
         where: { id },
@@ -29,12 +31,13 @@ class OrderItemItemRepository {
     return updateorderItem;
   };
 
-  addOrderItem = async (id, itemId, ordered) => {
+  incrementOrderItem = async (id, itemId, ordered, amount) => {
     const transaction = await sequelize.transaction();
     try {
-      const updateorderItem = await orderItems.update(
+      await orderItems.update(
         {
           state: ordered,
+          amount,
         },
         {
           where: { id },
@@ -65,24 +68,41 @@ class OrderItemItemRepository {
     }
   };
 
-  addItemAmount = async (itemId) => {
-    const updateItemAmount = await items.update(
-      {
-        where: { id: itemId },
-      },
-      { amount: (amount -= { models: orderItems, attributes: amount }) }
-    );
-    return updateItemAmount;
-  };
+  decrementOrderItem = async (id, itemId, ordered, amount) => {
+    const transaction = await sequelize.transaction();
+    try {
+      await orderItems.update(
+        {
+          state: ordered,
+          amount,
+        },
+        {
+          where: { id },
+        },
+        { transaction }
+      );
 
-  removeItemAmount = async (itemId) => {
-    const updateItemAmount = await items.update(
-      {
-        where: { id: itemId },
-      },
-      { amount: amount - { models: orderItems, attributes: amount } }
-    );
-    return updateItemAmount;
+      const orderItemAmount = await orderItems.findOne(
+        {
+          where: { id },
+        },
+        { transaction }
+      );
+
+      await items.decrement(
+        {
+          amount: orderItemAmount.amount,
+        },
+        {
+          where: { id: itemId },
+        },
+
+        { transaction }
+      );
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+    }
   };
 }
 

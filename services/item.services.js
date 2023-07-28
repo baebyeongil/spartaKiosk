@@ -30,7 +30,6 @@ class ItemService {
         message: Item,
       };
     } catch (err) {
-      console.log(err);
       return { status: 500, message: "Server Error" };
     }
   };

@@ -8,10 +8,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // this.belongsTo(models.order_customer, {
-      //   targetKey: "id",
-      //   foreignKey: "orderCustomerId",
-      // });
+      this.belongsTo(models.orderCustomers, {
+        targetKey: "id",
+        foreignKey: "orderCustomerId",
+      });
+
+      this.belongsTo(models.items, {
+        targetKey: "id",
+        foreignKey: "itemId",
+      });
     }
   }
   itemOrderCustomers.init(
@@ -22,6 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BIGINT,
         defaultValue: 0,
       },
+      option: { type: DataTypes.JSON },
+      price: { type: DataTypes.BIGINT },
     },
     {
       sequelize,

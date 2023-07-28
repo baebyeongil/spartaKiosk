@@ -1,18 +1,28 @@
 const OrderItemRepository = require("../repositories/orderItem.repositories");
 const ItemRepository = require("../repositories/item.repositories");
-const OrderItemState = require("../init");
-const orderItemState = new OrderItemState();
+const OrderItemStates = require("../init");
+const orderItemStates = new OrderItemStates();
 
 class OrderItemService {
   orderItemRepository = new OrderItemRepository();
   itemRepository = new ItemRepository();
 
-  orderItem = async (itemId) => {
+  orderItem = async (itemId, amount) => {
     try {
       if (!itemId) {
         return {
           status: 400,
           message: "발주 할 상품아이디를 확인해주세요.",
+        };
+      } else if (!amount) {
+        return {
+          status: 400,
+          message: "발주 할 수량을 확인해주세요.",
+        };
+      } else if (typeof amount == Number) {
+        return {
+          status: 400,
+          message: "발주 할 수량은 숫자로 입력해주세요.",
         };
       }
       const Item = await this.itemRepository.viewOneItem(itemId);
@@ -22,8 +32,8 @@ class OrderItemService {
           message: "해당 물품을 찾을 수 없습니다.",
         };
       }
-      const ordered = orderItemState.orderItemState.ORDERED;
-      await this.orderItemRepository.orderItem(itemId, ordered);
+      const ordered = await this.orderItemStates.orderItemState.ORDERED;
+      await this.orderItemRepository.orderItem(itemId, ordered, amount);
       return {
         status: 200,
         message: "발주 완료",
@@ -33,7 +43,7 @@ class OrderItemService {
     }
   };
 
-  updateOrderItem = async (id, state, itemId) => {
+  updateOrderItem = async (id, state, itemId, amount) => {
     try {
       if (!id) {
         return {
@@ -49,6 +59,16 @@ class OrderItemService {
         return {
           status: 400,
           message: "발주 할 상품아이디를 확인해주세요.",
+        };
+      } else if (!amount) {
+        return {
+          status: 400,
+          message: "발주 할 수량을 확인해주세요.",
+        };
+      } else if (typeof amount !== "number") {
+        return {
+          status: 400,
+          message: "발주 할 수량은 숫자로 입력해주세요.",
         };
       }
       const Item = await this.itemRepository.viewOneItem(itemId);
@@ -66,23 +86,23 @@ class OrderItemService {
           message: "존재하지 않는 발주입니다.",
         };
       }
-      const ordered = await orderItemState.orderItemState[state];
+      const ordered = await orderItemStates.orderItemState[state];
       if (ordered == undefined) {
         return {
           status: 400,
           message: "수정 할 발주 상태를 확인해주세요.",
         };
+      } else if (orderState.state == ordered) {
+        return {
+          status: 400,
+          message: "이미 발주가 완료된 상태입니다.",
+        };
       } else if (ordered == 2) {
         if (orderState.state == 1) {
-          await this.orderItemRepository.addOrderItem(id, itemId, ordered);
+          await this.orderItemRepository.incrementOrderItem(id, itemId, ordered, amount);
           return {
             status: 200,
             message: "발주 성공",
-          };
-        } else if (orderState.state == ordered) {
-          return {
-            status: 400,
-            message: "이미 발주가 완료된 상태입니다.",
           };
         } else {
           return {
@@ -90,13 +110,7 @@ class OrderItemService {
             message: "발주 상태가 PENDING상태가 아닙니다.",
           };
         }
-      }
-      if (orderState.state == ordered) {
-        return {
-          status: 400,
-          message: "발주 상태가 일치합니다.",
-        };
-      } else if (orderState.state == 2 && ordered == 0 && ordered == 1 && ordered == 3) {
+      } else if (orderState.state == 2) {
         const amountOrderItem = await this.orderItemRepository.findOrderItem(id);
         const amountItem = await this.itemRepository.viewOneItem(itemId);
 
@@ -105,26 +119,15 @@ class OrderItemService {
             status: 400,
             message: "현재 수량이 발주 수량보다 적어 발주 취소가 불가능합니다.",
           };
+        } else {
+          await this.orderItemRepository.decrementOrderItem(id, itemId, ordered, amount);
+          return {
+            status: 200,
+            message: "발주 취소",
+          };
         }
       }
-      // else {
-      //   const updateOrderItem = await this.orderItemRepository.updateOrderItem(id, ordered);
-      //   try {
-      //     await updateOrderItem.beginTransaction();
-      //     await this.orderItemRepository.removeItemAmount(itemId);
-
-      //     await updateOrderItem.commit();
-      //   } catch {
-      //     await updateOrderItem.rollback();
-      //   } finally {
-      //     updateOrderItem.release();
-      //   }
-      //   return {
-      //     status: 200,
-      //     message: "발주 취소",
-      //   };
-      // }
-      await this.orderItemRepository.updateOrderItem(id, ordered);
+      await this.orderItemRepository.updateOrderItem(id, ordered, amount);
       return {
         status: 200,
         message: "수정 완료",
