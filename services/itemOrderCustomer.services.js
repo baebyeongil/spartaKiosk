@@ -18,7 +18,6 @@ class ItemOrderCustomerService {
         };
       }
       const orderCustomer = await this.orderCustomerRepository.orderCustomer();
-      const orderCustomerId = orderCustomer.id;
       let totalPrice = 0;
       for (let i = 0; i < order.length; i++) {
         const itemId = order[i].itemId;
@@ -40,23 +39,22 @@ class ItemOrderCustomerService {
             message: "주문 옵션이 없습니다.",
           };
         }
+        if (typeof amount !== "number") {
+          return {
+            status: 400,
+            message: "갯수는 숫자로 입력해주세요.",
+          };
+        }
         const Item = await this.itemRepository.viewOneItem(itemId);
         if (!Item) {
           return {
             status: 400,
             message: "해당 상품이 없습니다.",
           };
-        } else if (typeof amount !== "number") {
-          return {
-            status: 400,
-            message: "갯수는 숫자로 입력해주세요.",
-          };
         }
-        const Itemprice = Item.price;
+        const orderItemPrice = await this.orderItem.orderPirce(Item.price, amount);
 
-        const orderItemPrice = await this.orderItem.orderPirce(Itemprice, amount);
-
-        await await this.itemOrderCustomerRepository.createOrder(itemId, amount, option, orderCustomerId, orderItemPrice);
+        await await this.itemOrderCustomerRepository.createOrder(itemId, amount, option, orderCustomer.id, orderItemPrice);
 
         totalPrice += orderItemPrice;
       }

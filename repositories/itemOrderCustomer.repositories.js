@@ -1,5 +1,5 @@
 const { itemOrderCustomers, orderCustomers, items } = require("../models");
-const sequelize = require("../models/index").sequelize;
+const sequelize = require("../models").sequelize;
 
 class ItemOrderCustomerRepository {
   createOrder = async (itemId, amount, option, orderCustomerId, orderItemPrice) => {

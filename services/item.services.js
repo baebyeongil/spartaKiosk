@@ -1,16 +1,22 @@
 const ItemRepository = require("../repositories/item.repositories");
 const ItemType = require("../init");
 const itemType = new ItemType();
+const myCache = require("../cache");
 
 class ItemService {
   itemRepository = new ItemRepository();
 
   createItem = async (name, price, type) => {
     try {
-      if (!name || !price) {
+      if (!name) {
         return {
           status: 400,
-          message: "{name}을 입력해주세요",
+          message: "상품명을 입력해주세요",
+        };
+      } else if (!price) {
+        return {
+          status: 400,
+          message: "가격을 정해주세요",
         };
       } else if (!type) {
         return {
@@ -20,22 +26,25 @@ class ItemService {
       } else if (!itemType.itemTypes[type]) {
         return {
           status: 400,
-          message: "알맞은 타입을 지정해주세요",
+          message: "올바르지 않은 타입입니다.",
         };
       }
       const iType = itemType.itemTypes[type];
-      const Item = await this.itemRepository.createItem(name, price, iType);
+      const optionId = itemType.optionId[type];
+      const Item = await this.itemRepository.createItem(name, price, iType, optionId);
       return {
         status: 200,
         message: Item,
       };
     } catch (err) {
+      console.log(err);
       return { status: 500, message: "Server Error" };
     }
   };
 
   viewAllItem = async () => {
     try {
+      const itemOption = await myCache.get("option");
       const Items = await this.itemRepository.viewAllItem();
       if (!Items) {
         return {

@@ -18,7 +18,7 @@ class OrderItemItemRepository {
     return OrderItem;
   };
 
-  updateOrderItem = async (id, ordered) => {
+  updateOrderItem = async (id, ordered, amount) => {
     const updateorderItem = await orderItems.update(
       {
         state: ordered,
@@ -31,13 +31,12 @@ class OrderItemItemRepository {
     return updateorderItem;
   };
 
-  incrementOrderItem = async (id, itemId, ordered, amount) => {
+  incrementOrderItem = async (id, itemId, ordered) => {
     const transaction = await sequelize.transaction();
     try {
       await orderItems.update(
         {
           state: ordered,
-          amount,
         },
         {
           where: { id },
@@ -68,13 +67,12 @@ class OrderItemItemRepository {
     }
   };
 
-  decrementOrderItem = async (id, itemId, ordered, amount) => {
+  decrementOrderItem = async (id, itemId, ordered) => {
     const transaction = await sequelize.transaction();
     try {
       await orderItems.update(
         {
           state: ordered,
-          amount,
         },
         {
           where: { id },

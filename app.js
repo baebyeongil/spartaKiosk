@@ -3,14 +3,28 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { sequelize } = require("./models");
 const indexRouter = require("./routes/index.routes");
+const OptionRepository = require("./repositories/options.repositories");
+const myCache = require("./cache");
 
 class Server {
+  optionRepository = new OptionRepository();
+
   expressconnect = async () => {
     this.app = express();
     this.PORT = 3000;
   };
 
-  connectMiddleware = async () => {
+  fetchOptionData = async () => {
+    const optionData = await this.optionRepository.viewOption();
+    const optionCache = await myCache.set("option", optionData);
+    if (!optionCache) {
+      console.log("optionCache False");
+    } else {
+      console.log("optionCache True");
+    }
+  };
+
+  connectMiddleware = async (test) => {
     this.app.use(express.json());
     this.app.use(cookieParser());
     this.app.use(cors());
@@ -20,7 +34,7 @@ class Server {
 
   connectDatabase = async () => {
     sequelize
-      .sync({ alter: true })
+      .sync({ force: true })
       .then(() => {
         console.log(`${this.PORT}번 포트가 정상적으로 열렸습니다1`);
       })
@@ -30,6 +44,7 @@ class Server {
   };
 
   start = async () => {
+    this.fetchOptionData();
     this.expressconnect();
     this.connectMiddleware();
     // this.connectDatabase();

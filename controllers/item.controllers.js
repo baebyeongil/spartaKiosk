@@ -1,7 +1,11 @@
 const ItemService = require("../services/item.services");
+const OptionService = require("../services/options.services");
+const NodeCache = require("node-cache");
+const myCache = new NodeCache({ stdTTL: 0, checkperiod: 600 });
 
 class ItemController {
   itemService = new ItemService();
+  optionService = new OptionService();
 
   createItem = async (req, res) => {
     const { name, price, type } = req.body;

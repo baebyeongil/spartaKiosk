@@ -5,6 +5,12 @@ class Init {
     FOOD: "food",
   };
 
+  optionId = {
+    COFFEE: 1,
+    JUICE: 2,
+    FOOD: 3,
+  };
+
   orderItemState = {
     ORDERED: 0,
     PENDING: 1,
