@@ -18,6 +18,16 @@ item Delete : delete("/item/:id") => (amount > 0) : delete / (amount < 0) : choi
 
 item Edit : put("/item/:id") , body("name" or "price")
 
+# ORDERITEM
+
+order Request : post("orderItem")
+
+order Edit : put("/orderItem/:id")
+
+order Complete : post("/orderItem/:id")
+
+order Delete : delete("/orderItem/:id")
+
 # OPTION
 
 option Create : post("/option")
@@ -28,7 +38,7 @@ option Edit : apu("/option/:id")
 
 option Delete : delete("/option/:id")
 
-# ORDER
+# ITEM ORDER CUSTOMER
 
 order Create : post("/order)
 
