@@ -9,7 +9,7 @@ const myCache = require("./cache");
 class Server {
   optionRepository = new OptionRepository();
 
-  expressconnect = async () => {
+  expressConnect = async () => {
     this.app = express();
     this.PORT = 3000;
   };
@@ -45,7 +45,7 @@ class Server {
 
   start = async () => {
     this.fetchOptionData();
-    this.expressconnect();
+    this.expressConnect();
     this.connectMiddleware();
     // this.connectDatabase();
     this.app.listen(3000, () => {
