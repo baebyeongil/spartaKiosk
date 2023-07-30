@@ -27,5 +27,14 @@ class Init {
     const totalPrcie = Itemprice * amount;
     return totalPrcie;
   }
+
+  totalOrderPrice(price, itemoption, amount, option) {
+    const orderExtra = option.extraPrice;
+    const ordershot = option.shotPrice;
+    const extraPrice = itemoption[0].extraPrice * orderExtra;
+    const shotPrice = itemoption[0].shotPrice * ordershot;
+
+    return (price + extraPrice + shotPrice) * amount;
+  }
 }
 module.exports = Init;

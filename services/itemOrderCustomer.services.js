@@ -2,6 +2,7 @@ const ItemOrderCustomerRepository = require("../repositories/itemOrderCustomer.r
 const OrderCustomerRepository = require("../repositories/orderCustomer.repositories");
 const ItemRepository = require("../repositories/item.repositories");
 const OrderItem = require("../init");
+const myCache = require("../cache");
 
 class ItemOrderCustomerService {
   itemOrderCustomerRepository = new ItemOrderCustomerRepository();
@@ -38,8 +39,17 @@ class ItemOrderCustomerService {
             status: 400,
             message: "주문 옵션이 없습니다.",
           };
-        }
-        if (typeof amount !== "number") {
+        } else if (option.extraPrice == undefined) {
+          return {
+            status: 400,
+            message: "사이즈를 선택해주세요.",
+          };
+        } else if (option.shotPrice == undefined) {
+          return {
+            status: 400,
+            message: "샷 추가 여부를 선택해주세요.",
+          };
+        } else if (typeof amount !== "number") {
           return {
             status: 400,
             message: "갯수는 숫자로 입력해주세요.",
@@ -52,18 +62,36 @@ class ItemOrderCustomerService {
             message: "해당 상품이 없습니다.",
           };
         }
+        const options = await myCache.get("option");
+        const itemOption = options.map((option) => {
+          return {
+            id: option.id,
+            extraPrice: option.extraPrice,
+            shotPrice: option.shotPrice,
+            hot: option.hot,
+          };
+        });
+        const itemoption = itemOption
+          .map((option) => {
+            if (Item.optionId === option.id) {
+              return option;
+            } else return null;
+          })
+          .filter((item3) => item3 !== null);
+
+        const totalOrderPrice = await this.orderItem.totalOrderPrice(Item.price, itemoption, amount, option);
+
         const orderItemPrice = await this.orderItem.orderPirce(Item.price, amount);
 
-        await await this.itemOrderCustomerRepository.createOrder(itemId, amount, option, orderCustomer.id, orderItemPrice);
+        await this.itemOrderCustomerRepository.createOrder(itemId, amount, option, orderCustomer.id, orderItemPrice);
 
-        totalPrice += orderItemPrice;
+        totalPrice += totalOrderPrice;
       }
       return {
         status: 200,
-        message: "현재 주문  { 총 가격 : " + totalPrice + " }",
+        message: "[주문 ID : " + orderCustomer.id + "] 가격 : { " + totalPrice + " }",
       };
     } catch (err) {
-      console.log(err);
       return { status: 500, message: "Server Error" };
     }
   };
@@ -95,7 +123,6 @@ class ItemOrderCustomerService {
         const customerInfo = await this.orderCustomerRepository.findCustomerInfo(orderCustomerId);
 
         const orderState = await this.orderItem.orderCustomerState[state];
-        console.log(orderState);
 
         if (orderState == undefined) {
           return {

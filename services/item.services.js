@@ -37,24 +37,51 @@ class ItemService {
         message: Item,
       };
     } catch (err) {
-      console.log(err);
       return { status: 500, message: "Server Error" };
     }
   };
 
   viewAllItem = async () => {
     try {
-      const itemOption = await myCache.get("option");
-      const Items = await this.itemRepository.viewAllItem();
-      if (!Items) {
+      const items = await this.itemRepository.viewAllItem();
+      if (!itemsList.length) {
         return {
-          status: 400,
+          status: 200,
           message: "현재 등록된 상품이 없습니다.",
         };
       }
+      const option = await myCache.get("option");
+      const itemOption = option.map((option) => {
+        return {
+          id: option.id,
+          extraPrice: option.extraPrice,
+          shotPrice: option.shotPrice,
+          hot: option.hot,
+        };
+      });
+      const itemList = items.map((item) => {
+        const options = itemOption
+          .map((option) => {
+            if (item.optionId === option.id) {
+              return option;
+            } else return null;
+          })
+          .filter((item3) => item3 !== null);
+        return {
+          id: item.id,
+          name: item.name,
+          optionId: item.optionId,
+          option: { ...options },
+          price: item.price,
+          type: item.type,
+          amount: item.amount,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
       return {
         status: 200,
-        message: Items,
+        message: itemList,
       };
     } catch (err) {
       return { status: 500, message: "Server Error" };
@@ -69,10 +96,39 @@ class ItemService {
           message: "알맞은 타입을 지정해주세요",
         };
       }
-      const Items = await this.itemRepository.viewTypeItem(type);
+      const items = await this.itemRepository.viewTypeItem(type);
+      const option = await myCache.get("option");
+      const itemOption = option.map((option) => {
+        return {
+          id: option.id,
+          extraPrice: option.extraPrice,
+          shotPrice: option.shotPrice,
+          hot: option.hot,
+        };
+      });
+      const itemList = items.map((item) => {
+        const options = itemOption
+          .map((option) => {
+            if (item.optionId === option.id) {
+              return option;
+            } else return null;
+          })
+          .filter((item3) => item3 !== null);
+        return {
+          id: item.id,
+          name: item.name,
+          optionId: item.optionId,
+          option: { ...options },
+          price: item.price,
+          type: item.type,
+          amount: item.amount,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
       return {
         status: 200,
-        message: Items,
+        message: itemList,
       };
     } catch (err) {
       return { status: 500, message: "Server Error" };

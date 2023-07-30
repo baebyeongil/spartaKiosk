@@ -2,7 +2,7 @@ const { orderCustomers } = require("../models");
 
 class OrderCustomerRepository {
   orderCustomer = async () => {
-    const order = await orderCustomers.create({});
+    const order = await orderCustomers.create();
     return order;
   };
 

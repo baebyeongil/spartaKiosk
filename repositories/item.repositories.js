@@ -13,6 +13,7 @@ class ItemRepository {
 
   viewAllItem = async () => {
     const Items = await items.findAll();
+
     return Items;
   };
 
